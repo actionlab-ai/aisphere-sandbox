@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aisphere-sandbox
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: agentkit-sandbox-controller
+  namespace: aisphere-sandbox
