@@ -33,4 +33,4 @@ jobs:
           VERSION: ${{ steps.vars.outputs.version }}
           PLATFORMS: linux/amd64,linux/arm64
           PUSH: 'false'
-        run: scripts/build-images.sh
+        run: bash scripts/build-images.sh
