@@ -1,0 +1,49 @@
+{
+  "server": {
+    "addr": ":18082"
+  },
+  "auth": {
+    "enabled": false,
+    "mode": "none",
+    "authEndpoint": "http://127.0.0.1:18080",
+    "sessionIntrospectPath": "/auth/sessions/introspect",
+    "iamCheckPath": "/iam/resource-grants/check",
+    "serviceToken": "",
+    "failClosed": true,
+    "app": "aihub",
+    "cookieName": "aisphere_session"
+  },
+  "sandbox": {
+    "driver": "agent-sandbox",
+    "namespace": "aisphere-sandbox",
+    "createNamespace": true,
+    "apiServer": "",
+    "tokenFile": "",
+    "caFile": "",
+    "insecure": false,
+    "serviceAccount": "agentkit-sandbox-controller",
+    "runtimeClassName": "",
+    "networkPolicyEnabled": true,
+    "defaultNetworkMode": "offline",
+    "defaultEgressCidrs": [],
+    "image": "registry.local/aisphere/agentkit-sandbox:latest",
+    "imagePullPolicy": "IfNotPresent",
+    "workspaceMountPath": "/workspace",
+    "storageClass": "nfs-client",
+    "workspaceSize": "10Gi",
+    "toolPort": 18081,
+    "browserPort": 9222,
+    "vncOrWebPort": 6080,
+    "defaultCpu": "500m",
+    "defaultMemory": "1Gi",
+    "maxCpu": "2",
+    "maxMemory": "4Gi",
+    "idleTtlSeconds": 3600,
+    "leaseTtlSeconds": 900,
+    "agentSandboxApiVersion": "v1beta1",
+    "useClaim": false,
+    "defaultTemplate": "aisphere-agent-session",
+    "defaultWarmPool": "",
+    "defaultProfile": "default-python-offline"
+  }
+}

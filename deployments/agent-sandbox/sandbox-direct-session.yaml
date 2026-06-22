@@ -1,0 +1,69 @@
+apiVersion: agents.x-k8s.io/v1beta1
+kind: Sandbox
+metadata:
+  name: aisphere-session-demo
+  namespace: aisphere-sandbox
+  labels:
+    aisphere.io/managed-by: aisphere-sandbox-adapter
+    aisphere.io/sandbox-id: aisphere-session-demo
+spec:
+  service: true
+  operatingMode: Running
+  podTemplate:
+    metadata:
+      labels:
+        aisphere.io/managed-by: aisphere-sandbox-adapter
+        aisphere.io/sandbox-id: aisphere-session-demo
+    spec:
+      restartPolicy: Always
+      serviceAccountName: agentkit-sandbox-controller
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: worker
+          image: registry.local/aisphere/agentkit-sandbox:latest
+          imagePullPolicy: IfNotPresent
+          workingDir: /workspace
+          ports:
+            - name: worker
+              containerPort: 8088
+            - name: tools
+              containerPort: 18081
+            - name: browser
+              containerPort: 9222
+          env:
+            - name: AISPHERE_SESSION_WORKER_ENABLED
+              value: "true"
+            - name: AISPHERE_WORKSPACE
+              value: /workspace
+            - name: AISPHERE_SANDBOX_ID
+              value: aisphere-session-demo
+            - name: AISPHERE_SESSION_ID
+              value: sess-demo
+            - name: AISPHERE_AGENT_ID
+              value: demo-agent
+            - name: AISPHERE_MODEL_BASE_URL
+              value: http://aisphere-gateway.aisphere-system.svc:18083/v1
+            - name: AISPHERE_MODEL_PROFILE
+              value: deepseek-v4-agent
+            - name: AISPHERE_MODEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: aisphere-gateway-worker-token
+                  key: token
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+  volumeClaimTemplates:
+    - metadata:
+        name: workspace
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi

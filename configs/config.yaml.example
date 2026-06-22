@@ -1,0 +1,41 @@
+# 说明：YAML 是推荐的配置格式；JSON 仍保持兼容。
+# SANDBOX_* 环境变量会覆盖此文件中的同名配置，密钥应只通过 Secret 注入。
+server:
+  addr: ":18082"
+auth:
+  enabled: true
+  mode: "aisphere" # none / trusted / aisphere
+  authEndpoint: "http://aisphere-auth.aisphere-system.svc:18080"
+  sessionIntrospectPath: "/auth/sessions/introspect"
+  iamCheckPath: "/iam/resource-grants/check"
+  serviceToken: "CHANGE_ME"
+  failClosed: true
+  app: "aihub"
+  cookieName: "aisphere_session"
+sandbox:
+  driver: "agent-sandbox" # agent-sandbox / direct-kubernetes
+  namespace: "aisphere-sandbox"
+  createNamespace: true
+  serviceAccount: "agentkit-sandbox-controller"
+  networkPolicyEnabled: true
+  defaultNetworkMode: "offline" # offline / restricted / online
+  defaultEgressCidrs: []
+  image: "registry.local/aisphere/agentkit-sandbox:latest"
+  imagePullPolicy: "IfNotPresent"
+  workspaceMountPath: "/workspace"
+  storageClass: "nfs-client"
+  workspaceSize: "10Gi"
+  toolPort: 18081
+  browserPort: 9222
+  vncOrWebPort: 6080
+  defaultCpu: "500m"
+  defaultMemory: "1Gi"
+  maxCpu: "2"
+  maxMemory: "4Gi"
+  idleTtlSeconds: 3600
+  leaseTtlSeconds: 900
+  agentSandboxApiVersion: "v1beta1"
+  useClaim: false # true 时使用 SandboxClaim + WarmPool；false 时直接创建 Sandbox CR
+  defaultTemplate: "aisphere-agent-session"
+  defaultWarmPool: ""
+  defaultProfile: "default-python-offline"

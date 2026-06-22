@@ -8,3 +8,30 @@ kind: ServiceAccount
 metadata:
   name: agentkit-sandbox-controller
   namespace: aisphere-sandbox
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: agentkit-sandbox-controller
+  namespace: aisphere-sandbox
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "services", "configmaps", "persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["networkpolicies"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: agentkit-sandbox-controller
+  namespace: aisphere-sandbox
+subjects:
+  - kind: ServiceAccount
+    name: agentkit-sandbox-controller
+    namespace: aisphere-sandbox
+roleRef:
+  kind: Role
+  name: agentkit-sandbox-controller
+  apiGroup: rbac.authorization.k8s.io

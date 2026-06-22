@@ -1,0 +1,114 @@
+[
+  {
+    "name": "workspace.list",
+    "description": "List files and directories under /workspace. Use this before reading or editing unknown project paths.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "path": {"type": "string", "description": "Workspace-relative path. Defaults to ."},
+        "recursive": {"type": "boolean", "default": false},
+        "maxEntries": {"type": "integer", "default": 200, "minimum": 1, "maximum": 5000}
+      }
+    }
+  },
+  {
+    "name": "workspace.read",
+    "description": "Read a UTF-8 text file from /workspace with size limits. Use offset/limit for large files.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": {"type": "string"},
+        "offset": {"type": "integer", "default": 0},
+        "limit": {"type": "integer", "default": 65536}
+      }
+    }
+  },
+  {
+    "name": "workspace.write",
+    "description": "Write or append UTF-8 text to a file under /workspace. Parent directories are created automatically.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["path", "content"],
+      "properties": {
+        "path": {"type": "string"},
+        "content": {"type": "string"},
+        "append": {"type": "boolean", "default": false}
+      }
+    }
+  },
+  {
+    "name": "workspace.patch",
+    "description": "Patch a text file under /workspace by replacing an exact string. Prefer this for targeted edits.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["path", "old", "new"],
+      "properties": {
+        "path": {"type": "string"},
+        "old": {"type": "string"},
+        "new": {"type": "string"},
+        "count": {"type": "integer", "default": 1, "description": "Maximum replacements. Use -1 for all."}
+      }
+    }
+  },
+  {
+    "name": "workspace.search_files",
+    "description": "Search file names/paths under /workspace using a substring query and optional glob.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "path": {"type": "string", "default": "."},
+        "query": {"type": "string"},
+        "glob": {"type": "string", "default": "*"},
+        "maxResults": {"type": "integer", "default": 200}
+      }
+    }
+  },
+  {
+    "name": "workspace.search_text",
+    "description": "Search text content under /workspace. Uses ripgrep when available.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["query"],
+      "properties": {
+        "path": {"type": "string", "default": "."},
+        "query": {"type": "string"},
+        "glob": {"type": "string"},
+        "maxResults": {"type": "integer", "default": 100}
+      }
+    }
+  },
+  {
+    "name": "workspace.mkdir",
+    "description": "Create a directory under /workspace.",
+    "inputSchema": {"type": "object", "required": ["path"], "properties": {"path": {"type": "string"}}}
+  },
+  {
+    "name": "workspace.delete",
+    "description": "Delete a file or, with recursive=true, a directory under /workspace. Cannot delete /workspace root.",
+    "inputSchema": {"type": "object", "required": ["path"], "properties": {"path": {"type": "string"}, "recursive": {"type": "boolean", "default": false}}}
+  },
+  {
+    "name": "browser.status",
+    "description": "Check whether the sandbox headless browser is available and report browser/debug status.",
+    "inputSchema": {"type": "object", "properties": {}}
+  },
+  {
+    "name": "browser.open",
+    "description": "Open a URL in the sandbox headless browser through the Chrome DevTools endpoint. Requires network mode to allow the target URL.",
+    "inputSchema": {"type": "object", "required": ["url"], "properties": {"url": {"type": "string"}}}
+  },
+  {
+    "name": "shell.exec",
+    "description": "Execute a shell command inside /workspace. Disabled by default; enable only for trusted sandboxes.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["command"],
+      "properties": {
+        "command": {"type": "string"},
+        "cwd": {"type": "string", "default": "."},
+        "timeoutSeconds": {"type": "integer", "default": 30, "maximum": 300}
+      }
+    }
+  }
+]

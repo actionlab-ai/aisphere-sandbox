@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aisphere-sandbox-config
+  namespace: aisphere-sandbox-system
+data:
+  config.json: |
+    {
+      "server": { "addr": ":18082" },
+      "auth": {
+        "enabled": true,
+        "mode": "aisphere",
+        "authEndpoint": "http://aisphere-auth.aisphere-system.svc:18080",
+        "sessionIntrospectPath": "/auth/sessions/introspect",
+        "iamCheckPath": "/iam/resource-grants/check",
+        "serviceToken": "CHANGE_ME_USE_SECRET_IN_PRODUCTION",
+        "failClosed": true,
+        "app": "aihub"
+      },
+      "sandbox": {
+        "driver": "kubernetes",
+        "namespace": "aisphere-sandbox",
+        "createNamespace": true,
+        "serviceAccount": "agentkit-sandbox-controller",
+        "networkPolicyEnabled": true,
+        "defaultNetworkMode": "offline",
+        "defaultEgressCidrs": [],
+        "image": "registry.local/aisphere/agentkit-sandbox:latest",
+        "imagePullPolicy": "IfNotPresent",
+        "workspaceMountPath": "/workspace",
+        "storageClass": "nfs-client",
+        "workspaceSize": "10Gi",
+        "toolPort": 18081,
+        "browserPort": 9222,
+        "vncOrWebPort": 6080,
+        "defaultCpu": "500m",
+        "defaultMemory": "1Gi",
+        "maxCpu": "2",
+        "maxMemory": "4Gi",
+        "idleTtlSeconds": 3600,
+        "leaseTtlSeconds": 900
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aisphere-sandbox
+  namespace: aisphere-sandbox-system
+  labels:
+    app.kubernetes.io/name: aisphere-sandbox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: aisphere-sandbox
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: aisphere-sandbox
+    spec:
+      serviceAccountName: aisphere-sandbox
+      containers:
+        - name: manager
+          image: registry.local/aisphere/aisphere-sandbox:latest
+          imagePullPolicy: IfNotPresent
+          args: ["--config", "/etc/aisphere/sandbox-manager/config.json"]
+          ports:
+            - name: http
+              containerPort: 18082
+          volumeMounts:
+            - name: config
+              mountPath: /etc/aisphere/sandbox-manager
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: config
+          configMap:
+            name: aisphere-sandbox-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aisphere-sandbox
+  namespace: aisphere-sandbox-system
+spec:
+  selector:
+    app.kubernetes.io/name: aisphere-sandbox
+  ports:
+    - name: http
+      port: 18082
+      targetPort: http

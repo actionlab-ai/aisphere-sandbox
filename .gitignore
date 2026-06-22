@@ -1,0 +1,23 @@
+# Local runtime configuration and secrets
+/config.yaml
+/config.json
+/.env
+/.env.*
+!.env.example
+
+# Runtime data and logs
+/data/
+/logs/
+*.log
+
+# Build artifacts
+/bin/
+*.exe
+*.test
+coverage.out
+
+# Local tooling
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
